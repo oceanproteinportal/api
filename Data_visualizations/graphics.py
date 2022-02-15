@@ -171,6 +171,26 @@ def depth_profile(protein_list):
 
     return fig
 
+def getphylocounts(level):
+        global allTaxaList
+        global xlist
+        df2 = mtwithtaxon.groupby(level).size()
+        df2_list = list(zip(df2,df2.index))
+        for entry in df2_list:
+            count = entry[0]
+            phylo1 = entry[1][-1]
+            phylo2 = entry[1][-2]
+            if not phylo1 in allTaxaList:
+                allTaxaList.append(phylo1)
+                xlist.append(1/len(level))
+            if not phylo2 in allTaxaList:
+                allTaxaList.append(phylo2)
+                xlist.append(1/len(level))
+            global sankeyList
+            sankeyList['source'].append(allTaxaList.index(phylo2))
+            sankeyList['target'].append(allTaxaList.index(phylo1))
+            sankeyList['value'].append(count)
+
 def sankey_plot(taxons_file,mtoutput_file):
     '''for the Sankey to work we need to return the taxon information for all the genome hits in metatryp
     this is essentially the information needed to return the LCA
@@ -195,27 +215,6 @@ def sankey_plot(taxons_file,mtoutput_file):
     sankeyList = {'source':[],'target':[],'value':[]}
     allTaxaList = []
     xlist = []
-    def getphylocounts(level):
-        global allTaxaList
-        global xlist
-        df2 = mtwithtaxon.groupby(level).size()
-        df2_list = list(zip(df2,df2.index))
-        for entry in df2_list:
-            count = entry[0]
-            phylo1 = entry[1][-1]
-            phylo2 = entry[1][-2]
-            if not phylo1 in allTaxaList:
-                allTaxaList.append(phylo1)
-                xlist.append(1/len(level))
-            if not phylo2 in allTaxaList:
-                allTaxaList.append(phylo2)
-                xlist.append(1/len(level))
-            global sankeyList
-            sankeyList['source'].append(allTaxaList.index(phylo2))
-            sankeyList['target'].append(allTaxaList.index(phylo1))
-            sankeyList['value'].append(count)
-            
-            
 
     level0 = ['Domain', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species']
     level1 = ['Domain', 'Phylum', 'Class', 'Order', 'Family', 'Genus']
